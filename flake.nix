@@ -259,10 +259,24 @@
         };
         pkgs = import nixpkgs {system = "x86_64-linux";};
         result_nvim = DSL.neovimBuilderWithDeps.legacyWrapper (neovim.defaultPackage.x86_64-linux) {
-          extraRuntimeDeps = [];
+          extraRuntimeDeps = with pkgs; [ripgrep clang rust-analyzer inputs.rnix-lsp.defaultPackage.x86_64-linux];
           withNodeJs = true;
           configure.customRC = DSL.DSL.neovimBuilder config;
-          configure.packages.myVimPackage.start = with pkgs.vimPlugins; [ ];
+          configure.packages.myVimPackage.start = with pkgs.vimPlugins; [
+            (telescope-nvim.overrideAttrs (oldattrs: { src = inputs.telescope-src; }))
+            (cmp-buffer.overrideAttrs (oldattrs: { src = inputs.cmp-buffer; }))
+            (nvim-cmp.overrideAttrs (oldattrs: { src = inputs.nvim-cmp; }))
+            (cmp-nvim-lsp.overrideAttrs (oldattrs: { src = inputs.nvim-cmp-lsp; }))
+            plenary-nvim
+            nerdcommenter
+            nvim-lspconfig
+            lspkind-nvim
+            (pkgs.vimPlugins.nvim-treesitter.withPlugins (
+              plugins: with plugins; [tree-sitter-nix tree-sitter-python tree-sitter-c tree-sitter-rust]
+            ))
+            lsp_signature-nvim
+            popup-nvim
+          ];
         };
   in
   {
