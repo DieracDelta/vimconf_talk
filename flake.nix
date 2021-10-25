@@ -36,17 +36,29 @@
       url = "github:hrsh7th/cmp-buffer";
       flake = false;
     };
+    rnix-lsp = {
+      url = "github:nix-community/rnix-lsp";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = inputs@{ self, nixpkgs, home-manager, neovim, nix-bundler, nix-utils, dracula-nvim, ...}:
-    let pkgs = import nixpkgs {system = "x86_64-linux";};
-        result_nvim = pkgs.wrapNeovim (neovim.defaultPackage.x86_64-linux) {
+  outputs = inputs@{ self, nixpkgs, home-manager, neovim, nix-bundler, nix-utils, dracula-nvim, DSL, ...}:
+  let
+        my_config = "";
+        pkgs = import nixpkgs {system = "x86_64-linux";};
+        result_nvim = DSL.neovimBuilderWithDeps.legacyWrapper (neovim.defaultPackage.x86_64-linux) {
+          extraRuntimeDeps = [];
           withNodeJs = true;
-          configure.customRC = "";
+          configure.customRC = my_config;
           configure.packages.myVimPackage.start = with pkgs.vimPlugins; [ ];
         };
   in
   {
+    my_config = pkgs.writeText "config" my_config;
     defaultPackage.x86_64-linux = result_nvim;
+    defaultApp.x86_64-linux = {
+        type = "app";
+        program = "${result_nvim}/bin/nvim";
+    };
   };
 }
