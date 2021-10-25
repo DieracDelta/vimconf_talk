@@ -45,7 +45,63 @@
   outputs = inputs@{ self, nixpkgs, home-manager, neovim, nix-bundler, nix-utils, dracula-nvim, DSL, ...}:
   let
         # HACK could just paste entire config in here
-        my_config = "";
+        my_config = "
+local cmp = require('cmp')
+ cmp.setup({
+    mapping = {
+      ['<C-n>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
+      ['<C-p>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
+      ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+      ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+      ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.close(),
+      ['<CR>'] = cmp.mapping.confirm({
+        behavior = cmp.ConfirmBehavior.Replace,
+        select = true,
+      })
+    },
+    sources = {
+      { name = 'nvim_lsp' },
+      { name = 'buffer' },
+    }
+  })
+
+local lspc = require('lspconfig')
+lspc.rust_analyzer.setup({
+  cmd = { 'rust-analyzer' },
+  capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+})
+
+lspc.rnix.setup({
+  cmd = {'rnix-lsp' },
+  capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+})
+
+require('lsp_signature').setup({
+  bind = true,
+  hint_enable = false,
+  hi_parameter = 'Visual',
+  handler_opts = {
+    border = 'single'
+  }
+})
+require('nvim-treesitter.configs').setup({
+ ensure_installed = {'bash', 'c', 'css', 'javascript', 'json', 'lua', 'nix', 'python', 'rust', 'toml'},
+ highlight = {
+   enable = true,
+   disable = {'css'}
+ },
+ rainbow = {
+   enable = true,
+   disable = {'html'},
+   extended_mode = true,
+   max_file_lines = 10000,
+   colors = {'#bd93f9', '#6272a4', '#8be9fd', '#50fa7b', '#f1fa8c', '#ffb86c', '#ff5555'}
+ }
+})
+        ";
         config = {
           extraConfig = my_config;
           setOptions = {
