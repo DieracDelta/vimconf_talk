@@ -254,6 +254,7 @@
           ];
           rawLua = [
             (DSL.DSL.callFn "vim.cmd" ["syntax on"])
+            (DSL.DSL.callFn "vim.cmd" ["colorscheme dracula"])
           ];
           pluginInit = {};
         };
@@ -263,6 +264,7 @@
           withNodeJs = true;
           configure.customRC = DSL.DSL.neovimBuilder config;
           configure.packages.myVimPackage.start = with pkgs.vimPlugins; [
+            (pkgs.vimUtils.buildVimPluginFrom2Nix { pname = "dracula-nvim"; version = "master"; src = dracula-nvim; })
             (telescope-nvim.overrideAttrs (oldattrs: { src = inputs.telescope-src; }))
             (cmp-buffer.overrideAttrs (oldattrs: { src = inputs.cmp-buffer; }))
             (nvim-cmp.overrideAttrs (oldattrs: { src = inputs.nvim-cmp; }))
