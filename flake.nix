@@ -44,12 +44,224 @@
 
   outputs = inputs@{ self, nixpkgs, home-manager, neovim, nix-bundler, nix-utils, dracula-nvim, DSL, ...}:
   let
+        # HACK could just paste entire config in here
         my_config = "";
+        config = {
+          extraConfig = my_config;
+          setOptions = {
+            vim.g = {
+              mapleader = " ";
+              nofoldenable = true;
+              noshowmode = true;
+              completeopt = "menu,menuone,noselect";
+            };
+            vim.o = {
+              termguicolors = true;
+              showcmd = true;
+              showmatch = true;
+              ignorecase = true;
+              smartcase = true;
+              cursorline = true;
+              wrap = true;
+              autoindent = true;
+              copyindent = true;
+              splitbelow = true;
+              splitright = true;
+              number = true;
+              relativenumber = true;
+              title = true;
+              undofile = true;
+              autoread = true;
+              hidden = true;
+              list = true;
+              background = "dark";
+              backspace = "indent,eol,start";
+              undolevels = 1000000;
+              undoreload = 1000000;
+              foldmethod = "indent";
+              foldnestmax = 10;
+              foldlevel = 1;
+              scrolloff = 3;
+              sidescrolloff = 5;
+              listchars = "tab:→→,trail:●,nbsp:○";
+              clipboard = "unnamed,unnamedplus";
+              formatoptions = "tcqj";
+              encoding = "utf-8";
+              fileencoding = "utf-8";
+              fileencodings = "utf-8";
+              bomb = true;
+              binary = true;
+              matchpairs = "(:),{:},[:],<:>";
+              expandtab = true;
+              pastetoggle = "<leader>v";
+              wildmode = "list:longest,list:full";
+            };
+          };
+          keybinds = [
+            {
+              mode = "n";
+              combo = "j";
+              command = "gj";
+              opts = {"noremap" = true; };
+            }
+            {
+              mode = "n";
+              combo = "k";
+              command = "gk";
+              opts = {"noremap" = true; };
+            }
+            {
+              mode = "n";
+              combo = "<leader>bb";
+              command = "<cmd>Telescope buffers<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>gg";
+              command = "<cmd>Telescope live_grep<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader><leader>";
+              command = "<cmd>Telescope find_files<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>ws";
+              command = "<cmd>sp<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>wv";
+              command = "<cmd>vs<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>bd";
+              command = "<cmd>q<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>bn";
+              command = "<cmd>tabnext<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>bp";
+              command = "<cmd>tabprevious<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>bN";
+              command = "<cmd>tabedit<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>bD";
+              command = "<cmd>Bclose!<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>wd";
+              command = "<cmd>q<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>wl";
+              command = "<cmd>wincmd l<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>wj";
+              command = "<cmd>wincmd j<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>wk";
+              command = "<cmd>wincmd k<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<leader>wh";
+              command = "<cmd>wincmd h<cr>";
+            }
+            {
+              mode = "n";
+              combo = "<space>D";
+              command = "<cmd>lua\tvim.lsp.buf.declaration()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>d";
+              command = "<cmd>lua\tvim.lsp.buf.definition()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "K";
+              command = "<cmd>lua\tvim.lsp.buf.hover()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>i";
+              command = "<cmd>lua\tvim.lsp.buf.implementation()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<C-k>";
+              command = "<cmd>lua\tvim.lsp.buf.signature_help()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>k";
+              command = "<cmd>lua\tvim.lsp.buf.type_definition()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>rn";
+              command = "<cmd>lua\tvim.lsp.buf.rename()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>ca";
+              command = "<cmd>lua\tvim.lsp.buf.code_action()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>r";
+              command = "<cmd>lua\tvim.lsp.buf.references()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>e";
+              command = "<cmd>lua\tvim.lsp.diagnostic.show_line_diagnostics()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+            {
+              mode = "n";
+              combo = "<space>f";
+              command = "<cmd>lua\tvim.lsp.buf.formatting()<CR>";
+              opts = {"noremap" = true; "silent" = true;};
+            }
+          ];
+          rawLua = [
+            (DSL.DSL.callFn "vim.cmd" ["syntax on"])
+          ];
+          pluginInit = {};
+        };
         pkgs = import nixpkgs {system = "x86_64-linux";};
         result_nvim = DSL.neovimBuilderWithDeps.legacyWrapper (neovim.defaultPackage.x86_64-linux) {
           extraRuntimeDeps = [];
           withNodeJs = true;
-          configure.customRC = my_config;
+          configure.customRC = DSL.DSL.neovimBuilder config;
           configure.packages.myVimPackage.start = with pkgs.vimPlugins; [ ];
         };
   in
