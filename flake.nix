@@ -338,7 +338,7 @@ require('nvim-treesitter.configs').setup({
         };
   in
   {
-    my_config = pkgs.writeText "config" my_config;
+    my_config = pkgs.writeText "config" (DSL.DSL.neovimBuilder config);
     defaultPackage.x86_64-linux = result_nvim;
     defaultApp.x86_64-linux = {
         type = "app";
