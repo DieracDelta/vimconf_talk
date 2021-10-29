@@ -12,7 +12,7 @@
     };
     neovim = {
       url =
-        "github:neovim/neovim?rev=88336851ee1e9c3982195592ae2fc145ecfd3369&dir=contrib";
+        "github:neovim/neovim?dir=contrib";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     telescope-src = {
@@ -51,13 +51,6 @@
       dsl = nix2vim.lib.dsl;
 
       overlay = prev: final: rec {
-        # Example of packaging plugin with Nix
-        dracula = prev.vimUtils.buildVimPluginFrom2Nix {
-          pname = "dracula-nvim";
-          version = "master";
-          src = dracula-nvim;
-        };
-
         # Generate our init.lua from neoConfig using vim2nix transpiler
         neovimConfig = let
           luaConfig = prev.luaConfigBuilder {
@@ -71,44 +64,17 @@
         # Building neovim package with dependencies and custom config
         customNeovim = DSL.neovimBuilderWithDeps.legacyWrapper neovim.defaultPackage.x86_64-linux {
           # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
-          extraRuntimeDeps = with prev; [
-            ripgrep
-            clang
-            rust-analyzer
-            inputs.rnix-lsp.defaultPackage.x86_64-linux
-          ];
+          extraRuntimeDeps = with prev; [ ];
 
           # Build with NodeJS
           withNodeJs = true;
 
           # Passing in raw lua config
           configure.customRC = ''
-            colorscheme dracula
             luafile ${neovimConfig}
           '';
 
-          configure.packages.myVimPackage.start = with prev.vimPlugins; [
-            # Adding reference to our custom plugin
-            dracula
-
-            # Overwriting plugin sources with different version
-            (withSrc telescope-nvim inputs.telescope-src)
-            (withSrc cmp-buffer inputs.cmp-buffer)
-            (withSrc nvim-cmp inputs.nvim-cmp)
-            (withSrc cmp-nvim-lsp inputs.cmp-nvim-lsp)
-
-            # Plugins from nixpkgs
-            lsp_signature-nvim
-            lspkind-nvim
-            nerdcommenter
-            nvim-lspconfig
-            plenary-nvim
-            popup-nvim
-
-            # Compile syntaxes into treesitter
-            (prev.vimPlugins.nvim-treesitter.withPlugins
-              (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust ]))
-          ];
+          configure.packages.myVimPackage.start = with prev.vimPlugins; [ ];
         };
 
       };
