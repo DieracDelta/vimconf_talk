@@ -1,19 +1,23 @@
 {
-  description = "A very basic flake";
+  description = "Tutorial Flake accompanying vimconf talk.";
 
+  # input source for our derivation
   inputs = {
-    nixpkgs = { url = "github:NixOS/nixpkgs/master"; };
+    nixpkgs.url = "github:NixOS/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
+    DSL.url = "github:DieracDelta/nix2lua";
     nix2vim = {
       url = "github:gytis-ivaskevicius/nix2vim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     neovim = {
-      url = "github:neovim/neovim?rev=88336851ee1e9c3982195592ae2fc145ecfd3369&dir=contrib";
+      url =
+        "github:neovim/neovim?rev=88336851ee1e9c3982195592ae2fc145ecfd3369&dir=contrib";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     telescope-src = {
-      url = "github:nvim-telescope/telescope.nvim?rev=b5c63c6329cff8dd8e23047eecd1f581379f1587";
+      url =
+        "github:nvim-telescope/telescope.nvim?rev=b5c63c6329cff8dd8e23047eecd1f581379f1587";
       flake = false;
     };
     dracula-nvim = {
@@ -38,10 +42,14 @@
     };
   };
 
-  outputs = inputs@{ self, flake-utils, nixpkgs, home-manager, neovim, dracula-nvim, nix2vim, ... }:
+  outputs = inputs@{ self, flake-utils, nixpkgs, home-manager, neovim
+    , dracula-nvim, nix2vim, ... }:
     let
+      # Function to override the source of a package
       withSrc = pkg: src: pkg.overrideAttrs (_: { inherit src; });
+      # Vim2Nix DSL
       dsl = nix2vim.lib.dsl;
+
       overlay = prev: final: rec {
         # Example of packaging plugin with Nix
         dracula = prev.vimUtils.buildVimPluginFrom2Nix {
@@ -50,29 +58,38 @@
           src = dracula-nvim;
         };
 
-        # init.lua derivation
-        neovimConfig =
-          let
-            luaConfig = prev.luaConfigBuilder {
-              config = import ./neoConfig.nix {
-                inherit (nix2vim.lib) dsl;
-                pkgs = prev;
-              };
+        # Generate our init.lua from neoConfig using vim2nix transpiler
+        neovimConfig = let
+          luaConfig = prev.luaConfigBuilder {
+            config = import ./neoConfig.nix {
+              inherit (nix2vim.lib) dsl;
+              pkgs = prev;
             };
-          in
-          prev.writeText "init.lua" luaConfig.lua;
+          };
+        in prev.writeText "init.lua" luaConfig.lua;
 
         # Building neovim package with dependencies and custom config
-        customNeovim = prev.wrapNeovim neovim.defaultPackage.x86_64-linux {
+        customNeovim = DSL.neovimBuilderWithDeps.legacyWrapper neovim.defaultPackage.x86_64-linux {
+          # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
+          extraRuntimeDeps = [
+            ripgrep
+            clang
+            rust-analyzer
+            inputs.rnix-lsp.defaultPackage.x86_64-linux
+            customNeovim
+          ];
+
+          # Build with NodeJS
           withNodeJs = true;
 
+          # Passing in raw lua config
           configure.customRC = ''
             colorscheme dracula
             luafile ${neovimConfig}
           '';
 
           configure.packages.myVimPackage.start = with prev.vimPlugins; [
-            # Adding reference our custom plugin
+            # Adding reference to our custom plugin
             dracula
 
             # Overwriting plugin sources with different version
@@ -89,43 +106,31 @@
             plenary-nvim
             popup-nvim
 
-            # Overwriting treesitter to with extra syntaxes
-            (prev.vimPlugins.nvim-treesitter.withPlugins (
-              plugins: with plugins; [ tree-sitter-nix tree-sitter-python tree-sitter-c tree-sitter-rust ]
-            ))
+            # Compile syntaxes into treesitter
+            (prev.vimPlugins.nvim-treesitter.withPlugins
+              (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust ]))
           ];
         };
 
       };
 
-    in
-    flake-utils.lib.eachDefaultSystem (system:
+    in flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           overlays = [ nix2vim.overlay overlay ];
         };
-      in
-      {
-        packages = {
-          inherit (pkgs) customNeovim neovimConfig;
-        };
+      in {
+        # The packages: our custom neovim and the config text file
+        packages = { inherit (pkgs) customNeovim neovimConfig; };
 
+        # The package built by `nix build .`
         defaultPackage = pkgs.customNeovim;
 
+        # The app run by `nix run .`
         defaultApp = {
           type = "app";
-          program = toString (pkgs.writeScript "nvim" "nix develop -c ${pkgs.customNeovim}/bin/nvim");
-        };
-
-        devShell = pkgs.mkShell {
-          propagatedBuildInputs = with pkgs; [
-            ripgrep
-            clang
-            rust-analyzer
-            inputs.rnix-lsp.defaultPackage.x86_64-linux
-            customNeovim
-          ];
+          program = "${pkgs.customNeovim}/bin/nvim";
         };
       });
 }
