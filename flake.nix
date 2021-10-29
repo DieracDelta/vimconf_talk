@@ -70,7 +70,12 @@
         # Building neovim package with dependencies and custom config
         customNeovim = DSL.neovimBuilderWithDeps.legacyWrapper neovim.defaultPackage.x86_64-linux {
           # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
-          extraRuntimeDeps = with prev; [ ];
+          extraRuntimeDeps = with prev; [
+            ripgrep
+            clang
+            rust-analyzer
+            inputs.rnix-lsp.defaultPackage.x86_64-linux
+          ];
 
           # Build with NodeJS
           withNodeJs = true;

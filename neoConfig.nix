@@ -77,4 +77,54 @@
   nnoremap."<leader>wk" = "<cmd>wincmd k<cr>";
   nnoremap."<leader>wh" = "<cmd>wincmd h<cr>";
 
+  use.lspconfig.rnix.setup = callWith {
+    cmd = [ "rnix-lsp" ] ;
+    capabilities = rawLua "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
+  };
+
+  use.lspconfig.rust_analyzer.setup = callWith {
+    cmd = [ "rust-analyzer" ] ;
+    capabilities = rawLua "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
+  };
+
+  use.lsp_signature.setup = callWith {
+    bind = true;
+    hint_enable = false;
+    hi_parameter = "Visual";
+    handler_opts.border = "single";
+  };
+
+  use."nvim-treesitter.configs".setup = callWith {
+    ensure_installed = [ "nix" "rust" ];
+    highlight = {
+      enable = true;
+      disable = [ "css" ];
+    };
+    rainbow = {
+      enable = true;
+      disable = [ "html" ];
+      extended_mode = true;
+      max_file_lines = 10000;
+      colors = [ "#bd93f9" "#6272a4" "#8be9fd" "#50fa7b" "#f1fa8c" "#ffb86c" "#ff5555" ];
+    };
+  };
+
+  use.cmp.setup = callWith {
+    mapping = {
+      "['<C-n>']" = rawLua "require('cmp').mapping.select_next_item({ behavior = require('cmp').SelectBehavior.Insert })";
+      "['<C-p>']" = rawLua "require('cmp').mapping.select_prev_item({ behavior = require('cmp').SelectBehavior.Insert })";
+      "['<Down>']" = rawLua "require('cmp').mapping.select_next_item({ behavior = require('cmp').SelectBehavior.Select })";
+      "['<Up>']" = rawLua "require('cmp').mapping.select_prev_item({ behavior = require('cmp').SelectBehavior.Select })";
+      "['<C-d>']" = rawLua "require('cmp').mapping.scroll_docs(-4)";
+      "['<C-f>']" = rawLua "require('cmp').mapping.scroll_docs(4)";
+      "['<C-Space>']" = rawLua "require('cmp').mapping.complete()";
+      "['<C-e>']" = rawLua "require('cmp').mapping.close()";
+      "['<CR>']" = rawLua "require('cmp').mapping.confirm({ behavior = require('cmp').ConfirmBehavior.Replace, select = true, })";
+    };
+    sources = [
+      { name = "nvim_lsp"; }
+      { name = "buffer"; }
+    ];
+  };
+
 }
