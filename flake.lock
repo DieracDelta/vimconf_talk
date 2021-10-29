@@ -16,6 +16,22 @@
         "type": "github"
       }
     },
+    "cmp-nvim-lsp": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1634450953,
+        "narHash": "sha256-lVcTATtmUu1dL9CvX/GR0b5fNj9IyWsls6kD07I3Hbc=",
+        "owner": "hrsh7th",
+        "repo": "cmp-nvim-lsp",
+        "rev": "accbe6d97548d8d3471c04d512d36fa61d0e4be8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hrsh7th",
+        "repo": "cmp-nvim-lsp",
+        "type": "github"
+      }
+    },
     "dracula-nvim": {
       "flake": false,
       "locked": {
@@ -189,22 +205,6 @@
         "type": "github"
       }
     },
-    "nvim-cmp-lsp": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1633004104,
-        "narHash": "sha256-vfL4OXpufc3lN3SGJsV1T4xOa5wyn05GdYRSms6VpAs=",
-        "owner": "hrsh7th",
-        "repo": "cmp-nvim-lsp",
-        "rev": "f93a6cf9761b096ff2c28a4f0defe941a6ffffb5",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hrsh7th",
-        "repo": "cmp-nvim-lsp",
-        "type": "github"
-      }
-    },
     "rnix-lsp": {
       "inputs": {
         "naersk": "naersk",
@@ -230,13 +230,13 @@
     "root": {
       "inputs": {
         "cmp-buffer": "cmp-buffer",
+        "cmp-nvim-lsp": "cmp-nvim-lsp",
         "dracula-nvim": "dracula-nvim",
         "home-manager": "home-manager",
         "neovim": "neovim",
         "nix2vim": "nix2vim",
         "nixpkgs": "nixpkgs_2",
         "nvim-cmp": "nvim-cmp",
-        "nvim-cmp-lsp": "nvim-cmp-lsp",
         "rnix-lsp": "rnix-lsp",
         "telescope-src": "telescope-src"
       }

@@ -23,7 +23,7 @@
       url = "github:hrsh7th/nvim-cmp";
       flake = false;
     };
-    nvim-cmp-lsp = {
+    cmp-nvim-lsp = {
       url = "github:hrsh7th/cmp-nvim-lsp";
       flake = false;
     };
@@ -39,6 +39,7 @@
 
   outputs = inputs@{ self, nixpkgs, home-manager, neovim, dracula-nvim, nix2vim, ... }:
     let
+      withSrc = pkg: src: pkg.overrideAttrs (_: { inherit src; });
       dsl = nix2vim.lib.dsl;
       pkgs = import nixpkgs {
         system = "x86_64-linux";
@@ -53,6 +54,12 @@
     {
       overlay = nix2vim.overlay;
       packages = {
+        vimUtils = pkgs.vimUtils.buildVimPluginFrom2Nix {
+          pname = "dracula-nvim";
+          version = "master";
+          src = dracula-nvim;
+        };
+
         nvimConfig = pkgs.writeText "init.lua" luaConfig.lua;
 
         neovim = pkgs.wrapNeovim neovim.defaultPackage.x86_64-linux {
@@ -61,29 +68,42 @@
             luafile ${self.packages.nvimConfig}
           '';
           configure.packages.myVimPackage.start = with pkgs.vimPlugins; [
-            (pkgs.vimUtils.buildVimPluginFrom2Nix { pname = "dracula-nvim"; version = "master"; src = dracula-nvim; })
-            (telescope-nvim.overrideAttrs (oldattrs: { src = inputs.telescope-src; }))
-            (cmp-buffer.overrideAttrs (oldattrs: { src = inputs.cmp-buffer; }))
-            (nvim-cmp.overrideAttrs (oldattrs: { src = inputs.nvim-cmp; }))
-            (cmp-nvim-lsp.overrideAttrs (oldattrs: { src = inputs.nvim-cmp-lsp; }))
-            plenary-nvim
+            self.packages.vimUtils
+            (withSrc telescope-nvim inputs.telescope-src)
+            (withSrc cmp-buffer inputs.cmp-buffer)
+            (withSrc nvim-cmp inputs.nvim-cmp)
+            (withSrc cmp-nvim-lsp inputs.cmp-nvim-lsp)
+
+            lsp_signature-nvim
+            lspkind-nvim
             nerdcommenter
             nvim-lspconfig
-            lspkind-nvim
+            plenary-nvim
+            popup-nvim
+
             (pkgs.vimPlugins.nvim-treesitter.withPlugins (
               plugins: with plugins; [ tree-sitter-nix tree-sitter-python tree-sitter-c tree-sitter-rust ]
             ))
-            lsp_signature-nvim
-            popup-nvim
           ];
         };
 
       };
-      #my_config = pkgs.writeText "config" (DSL.DSL.neovimBuilder config);
+
       defaultPackage.x86_64-linux = self.packages.neovim;
-      #defaultApp.x86_64-linux = {
-      #    type = "app";
-      #    program = "${result_nvim}/bin/nvim";
-      #};
+
+      defaultApp.x86_64-linux = {
+        type = "app";
+        program = toString (pkgs.writeScript "nvim" "nix develop -c ${self.packages.neovim}/bin/nvim");
+      };
+
+      devshell = pkgs.mkShell {
+        propagatedBuildInputs = with pkgs; [
+          ripgrep
+          clang
+          rust-analyzer
+          inputs.rnix-lsp.defaultPackage.x86_64-linux
+          self.packages.neovim
+        ];
+      };
     };
 }
