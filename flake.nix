@@ -74,7 +74,26 @@
             luafile ${neovimConfig}
           '';
 
-          configure.packages.myVimPackage.start = with prev.vimPlugins; [ ];
+          configure.packages.myVimPackage.start = with prev.vimPlugins; [ 
+
+            # Overwriting plugin sources with different version
+            (withSrc telescope-nvim inputs.telescope-src)
+            (withSrc cmp-buffer inputs.cmp-buffer)
+            (withSrc nvim-cmp inputs.nvim-cmp)
+            (withSrc cmp-nvim-lsp inputs.cmp-nvim-lsp)
+
+            # Plugins from nixpkgs
+            lsp_signature-nvim
+            lspkind-nvim
+            nerdcommenter
+            nvim-lspconfig
+            plenary-nvim
+            popup-nvim
+
+            # Compile syntaxes into treesitter
+            (prev.vimPlugins.nvim-treesitter.withPlugins
+              (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust ]))
+          ];
         };
 
       };
