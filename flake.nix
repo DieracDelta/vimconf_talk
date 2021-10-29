@@ -51,6 +51,12 @@
       dsl = nix2vim.lib.dsl;
 
       overlay = prev: final: rec {
+        # Example of packaging plugin with Nix
+        dracula = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "dracula-nvim";
+          version = "master";
+          src = dracula-nvim;
+        };
         # Generate our init.lua from neoConfig using vim2nix transpiler
         neovimConfig = let
           luaConfig = prev.luaConfigBuilder {
@@ -71,10 +77,13 @@
 
           # Passing in raw lua config
           configure.customRC = ''
+            colorscheme dracula
             luafile ${neovimConfig}
           '';
 
           configure.packages.myVimPackage.start = with prev.vimPlugins; [ 
+            # Adding reference to our custom plugin
+            dracula
 
             # Overwriting plugin sources with different version
             (withSrc telescope-nvim inputs.telescope-src)
