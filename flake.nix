@@ -1,7 +1,7 @@
 {
   description = "Tutorial Flake accompanying vimconf talk.";
 
-  # input source for our derivation
+  # Input source for our derivation
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
@@ -43,7 +43,7 @@
   };
 
   outputs = inputs@{ self, flake-utils, nixpkgs, home-manager, neovim
-    , dracula-nvim, nix2vim, ... }:
+    , dracula-nvim, nix2vim, DSL, ... }:
     let
       # Function to override the source of a package
       withSrc = pkg: src: pkg.overrideAttrs (_: { inherit src; });
@@ -71,12 +71,11 @@
         # Building neovim package with dependencies and custom config
         customNeovim = DSL.neovimBuilderWithDeps.legacyWrapper neovim.defaultPackage.x86_64-linux {
           # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
-          extraRuntimeDeps = [
+          extraRuntimeDeps = with prev; [
             ripgrep
             clang
             rust-analyzer
             inputs.rnix-lsp.defaultPackage.x86_64-linux
-            customNeovim
           ];
 
           # Build with NodeJS
