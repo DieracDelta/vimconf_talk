@@ -65,6 +65,7 @@
         neovim = pkgs.wrapNeovim neovim.defaultPackage.x86_64-linux {
           withNodeJs = true;
           configure.customRC = ''
+            colorscheme dracula
             luafile ${self.packages.nvimConfig}
           '';
           configure.packages.myVimPackage.start = with pkgs.vimPlugins; [
