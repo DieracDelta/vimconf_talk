@@ -5,19 +5,21 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/master";
     flake-utils.url = "github:numtide/flake-utils";
-    DSL.url = "github:DieracDelta/nix2lua";
+    DSL = {
+        url = "github:DieracDelta/nix2lua/aarch64-darwin";
+    };
     nix2vim = {
       url = "github:gytis-ivaskevicius/nix2vim";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     neovim = {
       url =
-        "github:neovim/neovim?rev=88336851ee1e9c3982195592ae2fc145ecfd3369&dir=contrib";
+        "github:neovim/neovim?dir=contrib";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     telescope-src = {
       url =
-        "github:nvim-telescope/telescope.nvim?rev=b5c63c6329cff8dd8e23047eecd1f581379f1587";
+        "github:nvim-telescope/telescope.nvim";
       flake = false;
     };
     dracula-nvim = {
@@ -42,7 +44,7 @@
     };
   };
 
-  outputs = inputs@{ self, flake-utils, nixpkgs, home-manager, neovim
+  outputs = inputs@{ self, flake-utils, nixpkgs, neovim
     , dracula-nvim, nix2vim, DSL, ... }:
     let
       # Function to override the source of a package
@@ -69,13 +71,13 @@
         in prev.writeText "init.lua" luaConfig.lua;
 
         # Building neovim package with dependencies and custom config
-        customNeovim = DSL.neovimBuilderWithDeps.legacyWrapper neovim.defaultPackage.x86_64-linux {
+        customNeovim = DSL.neovimBuilderWithDeps.legacyWrapper neovim.defaultPackage.aarch64-darwin {
           # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
           extraRuntimeDeps = with prev; [
             ripgrep
             clang
             rust-analyzer
-            inputs.rnix-lsp.defaultPackage.x86_64-linux
+            #inputs.rnix-lsp.defaultPackage.aarch64-darwin
           ];
 
           # Build with NodeJS
