@@ -1,10 +1,12 @@
-{ pkgs, dsl }: with dsl; {
+{ pkgs, dsl }:
+with dsl; {
 
   vim.g = {
     mapleader = " ";
     nofoldenable = true;
     noshowmode = true;
     completeopt = "menu,menuone,noselect";
+    noswapfile = true;
   };
 
   vim.o = {
@@ -48,52 +50,68 @@
     wildmode = "list:longest,list:full";
   };
 
-  nnoremap.j = "gj";
-  nnoremap.k = "gk";
-  nnoremap."<leader>D" = "<cmd>lua\tvim.lsp.buf.declaration()<CR>";
-  nnoremap."<leader>d" = "<cmd>lua\tvim.lsp.buf.definition()<CR>";
-  nnoremap.K = "<cmd>lua\tvim.lsp.buf.hover()<CR>";
-  nnoremap."<leader>i" = "<cmd>lua\tvim.lsp.buf.implementation()<CR>";
-  nnoremap."<C-k>" = "<cmd>lua\tvim.lsp.buf.signature_help()<CR>";
-  nnoremap."<leader>k" = "<cmd>lua\tvim.lsp.buf.type_definition()<CR>";
-  nnoremap."<leader>rn" = "<cmd>lua\tvim.lsp.buf.rename()<CR>";
-  nnoremap."<leader>ca" = "<cmd>lua\tvim.lsp.buf.code_action()<CR>";
-  nnoremap."<leader>r" = "<cmd>lua\tvim.lsp.buf.references()<CR>";
-  nnoremap."<leader>e" = "<cmd>lua\tvim.lsp.diagnostic.show_line_diagnostics()<CR>";
-  nnoremap."<leader>f" = "<cmd>lua\tvim.lsp.buf.formatting()<CR>";
-  nnoremap."<leader>bb" = "<cmd>Telescope buffers<cr>";
-  nnoremap."<leader>gg" = "<cmd>Telescope live_grep<cr>";
-  nnoremap."<leader><leader>" = "<cmd>Telescope find_files<cr>";
-  nnoremap."<leader>ws" = "<cmd>sp<cr>";
-  nnoremap."<leader>wv" = "<cmd>vs<cr>";
-  nnoremap."<leader>bd" = "<cmd>q<cr>";
-  nnoremap."<leader>bn" = "<cmd>tabnext<cr>";
-  nnoremap."<leader>bp" = "<cmd>tabprevious<cr>";
-  nnoremap."<leader>bN" = "<cmd>tabedit<cr>";
-  nnoremap."<leader>bD" = "<cmd>Bclose!<cr>";
-  nnoremap."<leader>wd" = "<cmd>q<cr>";
-  nnoremap."<leader>wl" = "<cmd>wincmd l<cr>";
-  nnoremap."<leader>wj" = "<cmd>wincmd j<cr>";
-  nnoremap."<leader>wk" = "<cmd>wincmd k<cr>";
-  nnoremap."<leader>wh" = "<cmd>wincmd h<cr>";
+  use.which-key.register = callWith
+    {
+      "K" = [ "<cmd>lua vim.lsp.buf.hover()<CR>" "Get Type Information" ];
+      "['<leader>']" = {
+        name = "+leader_bindings";
+        "D" = [ "<cmd>lua vim.lsp.buf.declaration()<CR>" "Jump to Declaration" ];
+        "d" = [ "<cmd>lua vim.lsp.buf.definition()<CR>" "Jump to Definition" ];
+        "i" = [ "<cmd>lua vim.lsp.buf.implementation()<CR>" "Jump to Implementation" ];
+        "s" = [ "<cmd>lua vim.lsp.buf.signature_help()<CR>" "Get function signature" ];
+        "k" = [ "<cmd>lua vim.lsp.buf.type_definition()<CR>" "Get type definition" ];
+        "rn" = [ "<cmd>lua vim.lsp.buf.rename()<CR>" "Rename function/variable" ];
+        "ca" = [ "<cmd>lua vim.lsp.buf.code_action()<CR>" "Perform code action" ];
+        "r" = [ "<cmd>lua vim.lsp.buf.references()<CR>" "Get function/variable refs" ];
+        "e" = [ "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>" "Get lsp errors" ];
+        "f" = [ "<cmd>lua vim.lsp.buf.formatting()<CR>" "Format buffer" ];
+        "bb" = [ "<cmd>Telescope buffers<cr>" "Get buffer list" ];
+        "gg" = [ "<cmd>Telescope live_grep<cr>" "Fzf fuzzy search" ];
+        "['<leader>']" = [ "<cmd>Telescope find_files<cr>" "search files" ];
+        "ws" = [ "<cmd>sp<cr>" "Split window horizontally" ];
+        "wv" = [ "<cmd>vs<cr>" "Split window vertically" ];
+        "bd" = [ "<cmd>q<cr>" "Delete buffer" ];
+        "bn" = [ "<cmd>tabnext<cr>" "Next buffer" ];
+        "bp" = [ "<cmd>tabprevious<cr>" "Previous buffer" ];
+        "bN" = [ "<cmd>tabedit<cr>" "New buffer/tab" ];
+        "bD" = [ "<cmd>Bclose!<cr>" "Delete buffer aggressively" ];
+        "wd" = [ "<cmd>q<cr>" "Delete window" ];
+        "wl" = [ "<cmd>wincmd l<cr>" "Move window right" ];
+        "wj" = [ "<cmd>wincmd j<cr>" "Move window down" ];
+        "wk" = [ "<cmd>wincmd k<cr>" "Move window up" ];
+        "wh" = [ "<cmd>wincmd h<cr>" "Move window left" ];
+      };
+    };
 
+  use.Comment.setup = callWith {
+    toggler = {
+      line = "<leader>c<leader>";
+      block = "<leader>b<leader>";
+    };
+    opleader = {
+      line = "<leader>c";
+      block = "<leader>b";
+    };
+    extra = {
+      above = "<leader>cO";
+      below = "<leader>co";
+      eol = "<leader>cA";
+    };
+  };
 
   use.lspconfig.rnix.setup = callWith {
-    cmd = [ "rnix-lsp" ] ;
-    capabilities = rawLua "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
+    cmd = [ "rnix-lsp" ];
+    capabilities = rawLua
+      "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
   };
 
   use.lspconfig.rust_analyzer.setup = callWith {
-    cmd = [ "rust-analyzer" ] ;
-    capabilities = rawLua "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
+    cmd = [ "rust-analyzer" ];
+    capabilities = rawLua
+      "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
   };
 
-  use.lsp_signature.setup = callWith {
-    bind = true;
-    hint_enable = false;
-    hi_parameter = "Visual";
-    handler_opts.border = "single";
-  };
+  use.telescope.setup = callWith { };
 
   use."nvim-treesitter.configs".setup = callWith {
     ensure_installed = [ "nix" "rust" ];
@@ -106,31 +124,49 @@
       disable = [ "html" ];
       extended_mode = true;
       max_file_lines = 10000;
-      colors = [ "#bd93f9" "#6272a4" "#8be9fd" "#50fa7b" "#f1fa8c" "#ffb86c" "#ff5555" ];
+      colors = [
+        "#bd93f9"
+        "#6272a4"
+        "#8be9fd"
+        "#50fa7b"
+        "#f1fa8c"
+        "#ffb86c"
+        "#ff5555"
+      ];
     };
   };
 
   use.cmp.setup = callWith {
     mapping = {
-      "['<C-n>']" = rawLua "require('cmp').mapping.select_next_item({ behavior = require('cmp').SelectBehavior.Insert })";
-      "['<C-p>']" = rawLua "require('cmp').mapping.select_prev_item({ behavior = require('cmp').SelectBehavior.Insert })";
-      "['<Down>']" = rawLua "require('cmp').mapping.select_next_item({ behavior = require('cmp').SelectBehavior.Select })";
-      "['<Up>']" = rawLua "require('cmp').mapping.select_prev_item({ behavior = require('cmp').SelectBehavior.Select })";
+      "['<C-n>']" = rawLua
+        "require('cmp').mapping.select_next_item({ behavior = require('cmp').SelectBehavior.Insert })";
+      "['<C-p>']" = rawLua
+        "require('cmp').mapping.select_prev_item({ behavior = require('cmp').SelectBehavior.Insert })";
+      "['<Down>']" = rawLua
+        "require('cmp').mapping.select_next_item({ behavior = require('cmp').SelectBehavior.Select })";
+      "['<Up>']" = rawLua
+        "require('cmp').mapping.select_prev_item({ behavior = require('cmp').SelectBehavior.Select })";
       "['<C-d>']" = rawLua "require('cmp').mapping.scroll_docs(-4)";
       "['<C-f>']" = rawLua "require('cmp').mapping.scroll_docs(4)";
       "['<C-Space>']" = rawLua "require('cmp').mapping.complete()";
       "['<C-e>']" = rawLua "require('cmp').mapping.close()";
-      "['<CR>']" = rawLua "require('cmp').mapping.confirm({ behavior = require('cmp').ConfirmBehavior.Replace, select = true, })";
+      "['<CR>']" = rawLua
+        "require('cmp').mapping.confirm({ behavior = require('cmp').ConfirmBehavior.Replace, select = true, })";
     };
-    sources = [
-      { name = "nvim_lsp"; }
-      { name = "buffer"; }
-    ];
+    sources = [{ name = "nvim_lsp"; } { name = "buffer"; }];
+    snippet.expand = rawLua '' function(args) require('luasnip').lsp_expand(args.body) end '';
   };
 
-  #          rawLua = [
-  #            (DSL.DSL.callFn "vim.cmd" ["syntax on"])
-  #            (DSL.DSL.callFn "vim.cmd" ["colorscheme dracula"])
-  #          ];
+  use.lsp_signature.setup = callWith {
+    bind = true;
+    hint_enable = false;
+    hi_parameter = "Visual";
+    handler_opts.border = "single";
+  };
+
+
+  use.which-key.setup = callWith { };
+
+  use.telescope.load_extension = callWith "harpoon";
 
 }
