@@ -9,6 +9,7 @@ with dsl; {
     noswapfile = true;
   };
 
+
   vim.o = {
     showcmd = true;
     showmatch = true;
@@ -153,8 +154,8 @@ with dsl; {
       "['<CR>']" = rawLua
         "require('cmp').mapping.confirm({ behavior = require('cmp').ConfirmBehavior.Replace, select = true, })";
     };
-    sources = [{ name = "nvim_lsp"; } { name = "buffer"; }];
-    snippet.expand = rawLua '' function(args) require('luasnip').lsp_expand(args.body) end '';
+    sources = [{ name = "nvim_lsp"; } { name = "buffer"; } { name = "vsnip"; }];
+    snippet.expand = rawLua '' function(args) vim.fn["vsnip#anonymous"](args.body) end '';
   };
 
   use.lsp_signature.setup = callWith {
@@ -164,9 +165,17 @@ with dsl; {
     handler_opts.border = "single";
   };
 
-
   use.which-key.setup = callWith { };
 
   use.telescope.load_extension = callWith "harpoon";
+
+  lua = ''
+    vim.api.nvim_set_keymap("i", "<Tab>", "vsnip#available(1)  ? '<Plug>(vsnip-jump-next)': '<Tab>'", {expr = true})
+    vim.api.nvim_set_keymap("s", "<Tab>", "vsnip#available(1)  ? '<Plug>(vsnip-jump-next)': '<Tab>'", {expr = true})
+    vim.api.nvim_set_keymap("i", "<S-Tab>", "vsnip#available(-1)  ? '<Plug>(vsnip-jump-prev)': '<S-Tab>'", {expr = true})
+    vim.api.nvim_set_keymap("s", "<S-Tab>", "vsnip#available(-1)  ? '<Plug>(vsnip-jump-prev)': '<S-Tab>'", {expr = true})
+    vim.api.nvim_set_keymap("i", "<C-j>", "vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-j>'", {expr = true})
+    vim.api.nvim_set_keymap("s", "<C-j>", "vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-j>'", {expr = true})
+  '';
 
 }

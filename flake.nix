@@ -122,9 +122,14 @@
               nvim-treesitter-context
               # for sane tab detection
               vim-sleuth
-              luasnip
+              vim-vsnip
+              vim-vsnip-integ
+              # FIXME figure out how to configure this one
               harpoon
+
               which-key-nvim
+              friendly-snippets
+
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
