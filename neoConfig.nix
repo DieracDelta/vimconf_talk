@@ -7,6 +7,7 @@ with dsl; {
     noshowmode = true;
     completeopt = "menu,menuone,noselect";
     noswapfile = true;
+    blamer_enabled = 1;
   };
 
 
@@ -82,6 +83,7 @@ with dsl; {
         "wk" = [ "<cmd>wincmd k<cr>" "Move window up" ];
         "wh" = [ "<cmd>wincmd h<cr>" "Move window left" ];
         "gs" = [ "<cmd>lua require('neogit').open()<CR>" "Open neogit (magit clone)" ];
+        "gb" = [ "<cmd>BlamerToggle<CR>" "Toggle git blame" ];
       };
     };
 
@@ -155,7 +157,7 @@ with dsl; {
       "['<CR>']" = rawLua
         "require('cmp').mapping.confirm({ behavior = require('cmp').ConfirmBehavior.Replace, select = true, })";
     };
-    sources = [{ name = "nvim_lsp"; } { name = "buffer"; } { name = "vsnip"; }];
+    sources = [{ name = "nvim_lsp"; } { name = "buffer"; } { name = "vsnip"; } ];
     snippet.expand = rawLua '' function(args) vim.fn["vsnip#anonymous"](args.body) end '';
   };
 

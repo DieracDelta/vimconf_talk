@@ -43,10 +43,14 @@
       url = "github:numToStr/Comment.nvim";
       flake = false;
     };
+    blamer-nvim-src = {
+      url = "github:APZelos/blamer.nvim";
+      flake = false;
+    };
   };
 
   outputs = inputs@{ self, flake-utils, nixpkgs, neovim, dracula-nvim, nix2vim
-    , DSL, comment-nvim-src, ... }:
+    , DSL, comment-nvim-src, blamer-nvim-src, ... }:
     let
       # Function to override the source of a package
       withSrc = pkg: src: pkg.overrideAttrs (_: { inherit src; });
@@ -65,6 +69,12 @@
           pname = "comment-nvim";
           version = "master";
           src = comment-nvim-src;
+        };
+
+        blamer-nvim = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "blamer-nvim";
+          version = "master";
+          src = blamer-nvim-src;
         };
 
         # Generate our init.lua from neoConfig using vim2nix transpiler
@@ -130,7 +140,7 @@
               which-key-nvim
               friendly-snippets
               neogit
-
+              blamer-nvim
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
