@@ -129,6 +129,7 @@
 
               which-key-nvim
               friendly-snippets
+              neogit
 
 
               # Compile syntaxes into treesitter

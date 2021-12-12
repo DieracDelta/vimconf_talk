@@ -81,6 +81,7 @@ with dsl; {
         "wj" = [ "<cmd>wincmd j<cr>" "Move window down" ];
         "wk" = [ "<cmd>wincmd k<cr>" "Move window up" ];
         "wh" = [ "<cmd>wincmd h<cr>" "Move window left" ];
+        "gs" = [ "<cmd>lua require('neogit').open()<CR>" "Open neogit (magit clone)" ];
       };
     };
 
@@ -166,6 +167,7 @@ with dsl; {
   };
 
   use.which-key.setup = callWith { };
+  use.neogit.setup = callWith { };
 
   use.telescope.load_extension = callWith "harpoon";
 
