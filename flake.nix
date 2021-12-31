@@ -88,14 +88,14 @@
         in prev.writeText "init.lua" luaConfig.lua;
 
         # Building neovim package with dependencies and custom config
-        customNeovim = DSL.neovimBuilderWithDeps.legacyWrapper
-          neovim.defaultPackage.aarch64-darwin {
+        customNeovim = (DSL.DSL prev).neovimBuilderWithDeps.legacyWrapper
+          neovim.defaultPackage.${prev.system} {
             # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
             extraRuntimeDeps = with prev; [
               ripgrep
               clang
               rust-analyzer
-              inputs.rnix-lsp.defaultPackage.aarch64-darwin
+              inputs.rnix-lsp.defaultPackage.${prev.system}
             ];
 
             # Build with NodeJS
@@ -161,8 +161,8 @@
         packages = { inherit (pkgs) customNeovim neovimConfig; };
 
         # The package built by `nix build .`
-        defaultPackage = pkgs.customNeovim;
 
+        defaultPackage = pkgs.customNeovim;
         # The app run by `nix run .`
         defaultApp = {
           type = "app";
