@@ -171,7 +171,7 @@ with dsl; {
   use.which-key.setup = callWith { };
   use.neogit.setup = callWith { };
 
-  use.telescope.load_extension = callWith "harpoon";
+  # use.telescope.load_extension = callWith "harpoon";
 
   lua = ''
     vim.api.nvim_set_keymap("i", "<Tab>", "vsnip#available(1)  ? '<Plug>(vsnip-jump-next)': '<Tab>'", {expr = true})

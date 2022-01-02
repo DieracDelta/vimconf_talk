@@ -77,6 +77,12 @@
           src = blamer-nvim-src;
         };
 
+        parinfer-rust-nvim = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "parinfer-rust";
+          version = "master";
+          src = prev.pkgs.parinfer-rust;
+        };
+
         # Generate our init.lua from neoConfig using vim2nix transpiler
         neovimConfig = let
           luaConfig = prev.luaConfigBuilder {
@@ -135,12 +141,14 @@
               vim-vsnip
               vim-vsnip-integ
               # FIXME figure out how to configure this one
-              harpoon
+              # harpoon
 
               which-key-nvim
               friendly-snippets
               neogit
               blamer-nvim
+
+              parinfer-rust-nvim
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
