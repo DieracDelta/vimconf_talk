@@ -47,10 +47,30 @@
       url = "github:APZelos/blamer.nvim";
       flake = false;
     };
+    telescope-ui-select-src = {
+      url = "github:nvim-telescope/telescope-ui-select.nvim";
+      flake = false;
+    };
+    rust-tools-src = {
+      url = "github:simrat39/rust-tools.nvim";
+      flake = false;
+    };
   };
 
-  outputs = inputs@{ self, flake-utils, nixpkgs, neovim, dracula-nvim, nix2vim
-    , DSL, comment-nvim-src, blamer-nvim-src, ... }:
+  outputs =
+    inputs@{ self
+    , flake-utils
+    , nixpkgs
+    , neovim
+    , dracula-nvim
+    , nix2vim
+    , DSL
+    , comment-nvim-src
+    , blamer-nvim-src
+    , telescope-ui-select-src
+    , rust-tools-src
+    , ...
+    }:
     let
       # Function to override the source of a package
       withSrc = pkg: src: pkg.overrideAttrs (_: { inherit src; });
@@ -83,22 +103,38 @@
           src = prev.pkgs.parinfer-rust;
         };
 
+        telescope-ui-select = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "telescope-ui-select";
+          version = "master";
+          src = telescope-ui-select-src;
+        };
+
+        rust-tools = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "rust-tools";
+          version = "master";
+          src = rust-tools-src;
+        };
+
         # Generate our init.lua from neoConfig using vim2nix transpiler
-        neovimConfig = let
-          luaConfig = prev.luaConfigBuilder {
-            config = import ./neoConfig.nix {
-              inherit (nix2vim.lib) dsl;
-              pkgs = prev;
+        neovimConfig =
+          let
+            luaConfig = prev.luaConfigBuilder {
+              config = import ./neoConfig.nix {
+                inherit (nix2vim.lib) dsl;
+                pkgs = prev;
+              };
             };
-          };
-        in prev.writeText "init.lua" luaConfig.lua;
+          in
+          prev.writeText "init.lua" luaConfig.lua;
 
         # Building neovim package with dependencies and custom config
         customNeovim = (DSL.DSL prev).neovimBuilderWithDeps.legacyWrapper
-          neovim.defaultPackage.${prev.system} {
+          neovim.defaultPackage.${prev.system}
+          {
             # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
             extraRuntimeDeps = with prev; [
-              ripgrep
+              fd # telescope file browser
+              ripgrep # telescope
               clang
               rust-analyzer
               inputs.rnix-lsp.defaultPackage.${prev.system}
@@ -128,6 +164,8 @@
               (withSrc nvim-cmp inputs.nvim-cmp)
               (withSrc cmp-nvim-lsp inputs.cmp-nvim-lsp)
 
+              (withSrc cmp-nvim-lsp inputs.cmp-nvim-lsp)
+
               # Plugins from nixpkgs
               lsp_signature-nvim
               lspkind-nvim
@@ -150,6 +188,18 @@
 
               parinfer-rust-nvim
 
+              telescope-file-browser-nvim
+              # sexy dropdown
+              telescope-ui-select
+
+              # more lsp rust functionality
+              rust-tools
+
+              # for updating rust crates
+              crates-nvim
+
+
+
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
                 (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust tree-sitter-json ]))
@@ -158,23 +208,25 @@
 
       };
 
-    in flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = import nixpkgs {
-          inherit system;
-          overlays = [ nix2vim.overlay overlay ];
-        };
-      in {
-        # The packages: our custom neovim and the config text file
-        packages = { inherit (pkgs) customNeovim neovimConfig; };
+    in
+    flake-utils.lib.eachDefaultSystem (system:
+    let
+      pkgs = import nixpkgs {
+        inherit system;
+        overlays = [ nix2vim.overlay overlay ];
+      };
+    in
+    {
+      # The packages: our custom neovim and the config text file
+      packages = { inherit (pkgs) customNeovim neovimConfig; };
 
-        # The package built by `nix build .`
+      # The package built by `nix build .`
 
-        defaultPackage = pkgs.customNeovim;
-        # The app run by `nix run .`
-        defaultApp = {
-          type = "app";
-          program = "${pkgs.customNeovim}/bin/nvim";
-        };
-      });
+      defaultPackage = pkgs.customNeovim;
+      # The app run by `nix run .`
+      defaultApp = {
+        type = "app";
+        program = "${pkgs.customNeovim}/bin/nvim";
+      };
+    });
 }

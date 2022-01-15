@@ -54,7 +54,7 @@ with dsl; {
 
   use.which-key.register = callWith
     {
-      "K" = [ "<cmd>lua vim.lsp.buf.hover()<CR>" "Get Type Information" ];
+      "K" = [ "<cmd>lua show_documentation()<CR>" "Get Type Information" ];
       "['<leader>']" = {
         name = "+leader_bindings";
         "D" = [ "<cmd>lua vim.lsp.buf.declaration()<CR>" "Jump to Declaration" ];
@@ -68,6 +68,7 @@ with dsl; {
         "e" = [ "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>" "Get lsp errors" ];
         "f" = [ "<cmd>lua vim.lsp.buf.formatting()<CR>" "Format buffer" ];
         "bb" = [ "<cmd>Telescope buffers<cr>" "Get buffer list" ];
+        "fb" = [ "<cmd>Telescope file_browser<cr>" "Get buffer list" ];
         "gg" = [ "<cmd>Telescope live_grep<cr>" "Fzf fuzzy search" ];
         "['<leader>']" = [ "<cmd>Telescope find_files<cr>" "search files" ];
         "ws" = [ "<cmd>sp<cr>" "Split window horizontally" ];
@@ -84,6 +85,19 @@ with dsl; {
         "wh" = [ "<cmd>wincmd h<cr>" "Move window left" ];
         "gs" = [ "<cmd>lua require('neogit').open()<CR>" "Open neogit (magit clone)" ];
         "gb" = [ "<cmd>BlamerToggle<CR>" "Toggle git blame" ];
+
+        # rust bindings
+        # TODO
+        # "rJ"
+        "rm" = [ "<cmd>lua require'rust-tools.expand_macro'.expand_macro()<CR>" "Expand macro" ];
+        "rh" = [ "cmd lua require('rust-tools.inlay_hints').toggle_inlay_hints()<CR>" "toggle inlay type hints"];
+        "rpm" = [ "cmd lua require'rust-tools.parent_module'.parent_module()<CR>" "go to parent module" ];
+        "rJ" = [ "cmd lua require'rust-tools.join_lines'.join_lines()<CR>" "join lines rust" ];
+        "cu" = [ "lua require('crates').update_crate()" "update a crate"];
+        "cua" = [ "lua require('crates').update_all_crates()" "update all crates"];
+        "cU" = [ "lua require('crates').upgrade_crate()" "upgrade a crate"];
+        "cUa" = [ "lua require('crates').upgrade_all_crates()" "upgrade all crates"];
+
       };
     };
 
@@ -103,6 +117,35 @@ with dsl; {
     };
   };
 
+  use.crates.setup = callWith {
+    text = {
+      loading = "  Loading...";
+      version = "  %s";
+      prerelease = "  %s";
+      yanked = "  %s yanked";
+      nomatch = "  Not found";
+      upgrade = "  %s";
+      error = "  Error fetching crate";
+    };
+    popup = {
+      text = {
+        title = " # %s ";
+        version = " %s ";
+        prerelease = " %s ";
+        yanked = " %s yanked ";
+        feature = "   %s ";
+        enabled = " * %s ";
+        transitive = " ~ %s ";
+      };
+    };
+    cmp = {
+      text = {
+        prerelease = " pre-release ";
+        yanked = " yanked ";
+      };
+    };
+  };
+
   use.lspconfig.rnix.setup = callWith {
     cmd = [ "rnix-lsp" ];
     capabilities = rawLua
@@ -115,7 +158,7 @@ with dsl; {
       "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
   };
 
-  use.telescope.setup = callWith { };
+
 
   use."nvim-treesitter.configs".setup = callWith {
     ensure_installed = [ "nix" "rust" ];
@@ -157,9 +200,10 @@ with dsl; {
       "['<CR>']" = rawLua
         "require('cmp').mapping.confirm({ behavior = require('cmp').ConfirmBehavior.Replace, select = true, })";
     };
-    sources = [{ name = "nvim_lsp"; } { name = "buffer"; } { name = "vsnip"; } ];
+    sources = [{ name = "nvim_lsp"; } { name = "buffer"; } { name = "vsnip"; } { name = "crates"; } ];
     snippet.expand = rawLua '' function(args) vim.fn["vsnip#anonymous"](args.body) end '';
   };
+
 
   use.lsp_signature.setup = callWith {
     bind = true;
@@ -170,8 +214,33 @@ with dsl; {
 
   use.which-key.setup = callWith { };
   use.neogit.setup = callWith { };
+  use.rust-tools.setup = callWith {
+    tools = {
+      autoSetHints = true;
+      runnables = {
+        use_telescope = true;
+      };
+      inlay_hints = {
 
-  # use.telescope.load_extension = callWith "harpoon";
+        only_current_line = false;
+        only_current_line_autocmd = "CursorMoved";
+
+        show_parameter_hints = true;
+
+        parameter_hints_prefix = "<- ";
+        other_hints_prefix = "=> ";
+
+        max_len_align = false;
+
+        max_len_align_padding = 1;
+
+        right_align = false;
+
+        right_align_padding = 7;
+        highlight = "DiagnosticSignWarn";
+      };
+    };
+  };
 
   lua = ''
     vim.api.nvim_set_keymap("i", "<Tab>", "vsnip#available(1)  ? '<Plug>(vsnip-jump-next)': '<Tab>'", {expr = true})
@@ -180,6 +249,30 @@ with dsl; {
     vim.api.nvim_set_keymap("s", "<S-Tab>", "vsnip#available(-1)  ? '<Plug>(vsnip-jump-prev)': '<S-Tab>'", {expr = true})
     vim.api.nvim_set_keymap("i", "<C-j>", "vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-j>'", {expr = true})
     vim.api.nvim_set_keymap("s", "<C-j>", "vsnip#available(1)  ? '<Plug>(vsnip-expand-or-jump)' : '<C-j>'", {expr = true})
+
+    require("telescope").setup {
+      extensions = {
+        ["ui-select"] = {
+          require("telescope.themes").get_dropdown {
+            -- even more opts
+          }
+        }
+      }
+    }
+    require("telescope").load_extension("file_browser")
+    require("telescope").load_extension("ui-select")
+    function show_documentation()
+        local filetype = vim.bo.filetype
+        if vim.tbl_contains({ 'vim','help' }, filetype) then
+            vim.cmd('h '..vim.fn.expand('<cword>'))
+        elseif vim.tbl_contains({ 'man' }, filetype) then
+            vim.cmd('Man '..vim.fn.expand('<cword>'))
+        elseif vim.fn.expand('%:t') == 'Cargo.toml' then
+            require('crates').show_popup()
+        else
+            vim.lsp.buf.hover()
+        end
+    end
   '';
 
 }
