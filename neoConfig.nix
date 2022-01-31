@@ -74,8 +74,8 @@ with dsl; {
         "ws" = [ "<cmd>sp<cr>" "Split window horizontally" ];
         "wv" = [ "<cmd>vs<cr>" "Split window vertically" ];
         "bd" = [ "<cmd>q<cr>" "Delete buffer" ];
-        "bn" = [ "<cmd>tabnext<cr>" "Next buffer" ];
-        "bp" = [ "<cmd>tabprevious<cr>" "Previous buffer" ];
+        "bn" = [ "<cmd>bnext<cr>" "Next buffer" ];
+        "bp" = [ "<cmd>bprev<cr>" "Previous buffer" ];
         "bN" = [ "<cmd>tabedit<cr>" "New buffer/tab" ];
         "bD" = [ "<cmd>Bclose!<cr>" "Delete buffer aggressively" ];
         "wd" = [ "<cmd>q<cr>" "Delete window" ];
@@ -85,6 +85,7 @@ with dsl; {
         "wh" = [ "<cmd>wincmd h<cr>" "Move window left" ];
         "gs" = [ "<cmd>lua require('neogit').open()<CR>" "Open neogit (magit clone)" ];
         "gb" = [ "<cmd>BlamerToggle<CR>" "Toggle git blame" ];
+        "gc" = ["<cmd>Neogen<CR>" "generate comments boilerplate"];
 
         # rust bindings
         # TODO
@@ -156,6 +157,13 @@ with dsl; {
     cmd = [ "rust-analyzer" ];
     capabilities = rawLua
       "require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())";
+    settings = {
+      "['rust-analyzer']" = {
+        procMacro = {
+          enable = true;
+        };
+      };
+    };
   };
 
 
@@ -241,6 +249,12 @@ with dsl; {
       };
     };
   };
+
+  use.neogen.setup = callWith {
+    enabled = true;
+  };
+
+  use.fidget.setup = callWith {};
 
   lua = ''
     vim.api.nvim_set_keymap("i", "<Tab>", "vsnip#available(1)  ? '<Plug>(vsnip-jump-next)': '<Tab>'", {expr = true})

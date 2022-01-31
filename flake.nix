@@ -11,7 +11,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     neovim = {
-      url = "github:neovim/neovim?ref=release-0.6&dir=contrib";
+      # release 0.6.1
+      url = "github:neovim/neovim?dir=contrib&ref=5b839ced692230fe582fde41f79f875ee90451e8";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     telescope-src = {
@@ -36,8 +37,8 @@
       flake = false;
     };
     rnix-lsp = {
-      url = "github:DieracDelta/rnix-lsp/mbp-fix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Ma27/rnix-lsp?ref=01b3623b49284d87a034676d3f4b298e495190dd";
+      # inputs.nixpkgs.follows = "nixpkgs";
     };
     comment-nvim-src = {
       url = "github:numToStr/Comment.nvim";
@@ -55,6 +56,14 @@
       url = "github:simrat39/rust-tools.nvim";
       flake = false;
     };
+    fidget-src = {
+      url = "github:j-hui/fidget.nvim";
+      flake = false;
+    };
+    neogen-src = {
+      url = "github:danymat/neogen";
+      flake = false;
+    };
   };
 
   outputs =
@@ -69,6 +78,8 @@
     , blamer-nvim-src
     , telescope-ui-select-src
     , rust-tools-src
+    , fidget-src
+    , neogen-src
     , ...
     }:
     let
@@ -114,6 +125,20 @@
           version = "master";
           src = rust-tools-src;
         };
+
+        fidget = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "fidget";
+          version = "master";
+          src = fidget-src;
+        };
+
+        neogen = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "neogen";
+          version = "master";
+          src = neogen-src;
+        };
+
+
 
         # Generate our init.lua from neoConfig using vim2nix transpiler
         neovimConfig =
@@ -197,6 +222,12 @@
 
               # for updating rust crates
               crates-nvim
+
+              # for showing lsp progress
+              fidget
+
+              # for generating boilerplate for comments
+              neogen
 
 
 
