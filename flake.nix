@@ -152,12 +152,16 @@
           in
           prev.writeText "init.lua" luaConfig.lua;
 
+        # shamelessly copied from fufexan (thanks buddy!)
+
         # Building neovim package with dependencies and custom config
         customNeovim = (DSL.DSL prev).neovimBuilderWithDeps.legacyWrapper
           neovim.defaultPackage.${prev.system}
           {
             # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
             extraRuntimeDeps = with prev; [
+              clang-tools # fix headers not found
+              clang # LSP and compiler
               fd # telescope file browser
               ripgrep # telescope
               clang
@@ -233,7 +237,7 @@
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
-                (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust tree-sitter-json ]))
+                (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust tree-sitter-json tree-sitter-c ]))
             ];
           };
 

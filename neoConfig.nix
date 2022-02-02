@@ -166,6 +166,8 @@ with dsl; {
     };
   };
 
+  use.lspconfig.clangd.setup = callWith {};
+
 
 
   use."nvim-treesitter.configs".setup = callWith {
