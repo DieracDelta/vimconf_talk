@@ -87,9 +87,10 @@ with dsl; {
         "gb" = [ "<cmd>BlamerToggle<CR>" "Toggle git blame" ];
         "gc" = ["<cmd>Neogen<CR>" "generate comments boilerplate"];
 
-        # rust bindings
-        # TODO
-        # "rJ"
+        "l" = ["<cmd>Telescope resume<CR>" "last telescope query"];
+
+        "gf" = ["<cmd>lua require('telescope.builtins').live_grep {default_text='function'}<CR>" "grep for functions only"];
+
         "rm" = [ "<cmd>lua require'rust-tools.expand_macro'.expand_macro()<CR>" "Expand macro" ];
         "rh" = [ "cmd lua require('rust-tools.inlay_hints').toggle_inlay_hints()<CR>" "toggle inlay type hints"];
         "rpm" = [ "cmd lua require'rust-tools.parent_module'.parent_module()<CR>" "go to parent module" ];
@@ -289,6 +290,13 @@ with dsl; {
             vim.lsp.buf.hover()
         end
     end
+    local capabilities = vim.lsp.protocol.make_client_capabilities()
+    capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+    require'lspconfig'.jsonls.setup {
+      cmd = {'vscode-json-languageserver', '--stdio'},
+      capabilities = capabilities,
+    }
   '';
 
 }

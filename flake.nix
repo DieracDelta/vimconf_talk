@@ -164,9 +164,10 @@
               clang # LSP and compiler
               fd # telescope file browser
               ripgrep # telescope
-              clang
-              rust-analyzer
-              inputs.rnix-lsp.defaultPackage.${prev.system}
+              clang # c
+              nodePackages.vscode-json-languageserver # json
+              rust-analyzer # rust
+              inputs.rnix-lsp.defaultPackage.${prev.system} # nix
             ];
 
             # Build with NodeJS
@@ -232,8 +233,6 @@
 
               # for generating boilerplate for comments
               neogen
-
-
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
