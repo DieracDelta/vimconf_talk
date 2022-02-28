@@ -169,6 +169,8 @@ with dsl; {
 
   use.lspconfig.clangd.setup = callWith {};
 
+  use.lspconfig.gopls.setup = callWith {};
+
 
 
   use."nvim-treesitter.configs".setup = callWith {
@@ -257,7 +259,7 @@ with dsl; {
     enabled = true;
   };
 
-  use.fidget.setup = callWith {};
+  # use.fidget.setup = callWith {};
 
   lua = ''
     vim.api.nvim_set_keymap("i", "<Tab>", "vsnip#available(1)  ? '<Plug>(vsnip-jump-next)': '<Tab>'", {expr = true})

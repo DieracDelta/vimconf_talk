@@ -167,6 +167,7 @@
               clang # c
               nodePackages.vscode-json-languageserver # json
               rust-analyzer # rust
+              gopls
               inputs.rnix-lsp.defaultPackage.${prev.system} # nix
             ];
 
@@ -236,7 +237,7 @@
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
-                (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust tree-sitter-json tree-sitter-c ]))
+                (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust tree-sitter-json tree-sitter-c tree-sitter-go ]))
             ];
           };
 
