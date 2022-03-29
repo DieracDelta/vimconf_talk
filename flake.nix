@@ -168,6 +168,7 @@
               nodePackages.vscode-json-languageserver # json
               rust-analyzer # rust
               gopls
+              pyright
               inputs.rnix-lsp.defaultPackage.${prev.system} # nix
             ];
 
