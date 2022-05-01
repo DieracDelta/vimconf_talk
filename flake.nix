@@ -3,17 +3,25 @@
 
   # Input source for our derivation
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/master";
+    master.url = "github:NixOS/nixpkgs/master";
+    nixpkgs.url = "github:NixOS/nixpkgs/21.11";
+    stable.url = "github:NixOS/nixpkgs/21.11";
     flake-utils.url = "github:numtide/flake-utils";
-    DSL = { url = "github:DieracDelta/nix2lua/aarch64-darwin"; };
+    DSL = {
+      url = "github:DieracDelta/nix2lua/aarch64-darwin";
+      inputs.neovim.follows = "neovim";
+      inputs.nixpkgs.follows = "stable";
+    };
+    terraform-ls-src = {
+      url = "github:hashicorp/terraform-ls";
+      flake = false;
+    };
     nix2vim = {
       url = "github:gytis-ivaskevicius/nix2vim";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "stable";
     };
     neovim = {
-      # release 0.6.1
-      url = "github:neovim/neovim?dir=contrib&ref=5b839ced692230fe582fde41f79f875ee90451e8";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:neovim/neovim?dir=contrib&ref=master";
     };
     telescope-src = {
       url =
@@ -38,7 +46,7 @@
     };
     rnix-lsp = {
       url = "github:Ma27/rnix-lsp?ref=01b3623b49284d87a034676d3f4b298e495190dd";
-      # inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "stable";
     };
     comment-nvim-src = {
       url = "github:numToStr/Comment.nvim";
@@ -64,6 +72,10 @@
       url = "github:danymat/neogen";
       flake = false;
     };
+    which-key-src = {
+      url = "github:folke/which-key.nvim";
+      flake = false;
+    };
   };
 
   outputs =
@@ -78,8 +90,11 @@
     , blamer-nvim-src
     , telescope-ui-select-src
     , rust-tools-src
+    , which-key-src
     , fidget-src
     , neogen-src
+    , stable
+    , master
     , ...
     }:
     let
@@ -138,6 +153,12 @@
           src = neogen-src;
         };
 
+        which-key = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "which-key";
+          version = "master";
+          src = which-key-src;
+        };
+
 
 
         # Generate our init.lua from neoConfig using vim2nix transpiler
@@ -160,13 +181,46 @@
           {
             # Dependencies to be prepended to PATH env variable at runtime. Needed by plugins at runtime.
             extraRuntimeDeps = with prev; [
-              clang-tools # fix headers not found
+              (
+                buildGoModule rec {
+                  pname = "terraform-ls";
+                  version = "0.27.0";
+
+                  src = fetchFromGitHub {
+                    owner = "hashicorp";
+                    repo = pname;
+                    rev = "v${version}";
+                    sha256 = "sha256-TWxYCHdzeJtdyPajA3XxqwpDufXnLod6LWa28OHjyms=";
+                  };
+
+                  vendorSha256 = "sha256-e/m/8h0gF+kux+pCUqZ7Pw0XlyJ5dL0Zyqb0nUlgfpc=";
+                  ldflags = [ "-s" "-w" "-X main.version=v${version}" "-X main.prerelease=" ];
+
+                  # There's a mixture of tests that use networking and several that fail on aarch64
+                  doCheck = false;
+
+                  doInstallCheck = true;
+                  installCheckPhase = ''
+                    runHook preInstallCheck
+                    $out/bin/terraform-ls --help
+                    $out/bin/terraform-ls version | grep "v${version}"
+                    runHook postInstallCheck
+                  '';
+
+                  meta = with lib; {
+                    description = "Terraform Language Server (official)";
+                    homepage = "https://github.com/hashicorp/terraform-ls";
+                    changelog = "https://github.com/hashicorp/terraform-ls/blob/v${version}/CHANGELOG.md";
+                    license = licenses.mpl20;
+                    maintainers = with maintainers; [ mbaillie jk ];
+                  };
+                }
+              )
+              # master.clang-tools # fix headers not found
               clang # LSP and compiler
               fd # telescope file browser
               ripgrep # telescope
-              clang # c
               nodePackages.vscode-json-languageserver # json
-              rust-analyzer # rust
               gopls
               pyright
               inputs.rnix-lsp.defaultPackage.${prev.system} # nix
@@ -181,7 +235,7 @@
               luafile ${neovimConfig}
             '';
 
-            configure.packages.myVimPackage.start = with prev.vimPlugins; [
+            configure.packages.myVimPackage.start = with master.legacyPackages.${prev.system}.vimPlugins; [
               # Adding reference to our custom plugin
               # for themeing
               dracula
@@ -213,14 +267,14 @@
               # FIXME figure out how to configure this one
               # harpoon
 
-              which-key-nvim
+              which-key
               friendly-snippets
               neogit
               blamer-nvim
 
               parinfer-rust-nvim
 
-              telescope-file-browser-nvim
+              master.legacyPackages.${prev.system}.vimPlugins.telescope-file-browser-nvim
               # sexy dropdown
               telescope-ui-select
 
@@ -238,7 +292,7 @@
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins
-                (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust tree-sitter-json tree-sitter-c tree-sitter-go ]))
+                (plugins: with plugins; [ tree-sitter-nix tree-sitter-rust tree-sitter-json tree-sitter-c tree-sitter-go master.legacyPackages.${prev.system}.tree-sitter-grammars.tree-sitter-hcl]))
             ];
           };
 
@@ -264,5 +318,6 @@
         type = "app";
         program = "${pkgs.customNeovim}/bin/nvim";
       };
+
     });
 }

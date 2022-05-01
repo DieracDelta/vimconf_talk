@@ -103,6 +103,9 @@ with dsl; {
       };
     };
 
+  use.lspconfig.pyright.setup = callWith {};
+  use.lspconfig.terraformls.setup = callWith {};
+
   use.Comment.setup = callWith {
     toggler = {
       line = "<leader>c<leader>";
