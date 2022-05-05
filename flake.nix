@@ -76,10 +76,19 @@
       url = "github:folke/which-key.nvim";
       flake = false;
     };
+    conceal-src = {
+      url = "github:ticki/rust-cute-vim";
+      flake = false;
+    };
+    colorizer-src = {
+      url = "github:powerman/vim-plugin-AnsiEsc";
+      flake = false;
+    };
   };
 
   outputs =
-    inputs@{ self
+    inputs@{
+      self
     , flake-utils
     , nixpkgs
     , neovim
@@ -93,6 +102,8 @@
     , which-key-src
     , fidget-src
     , neogen-src
+    , conceal-src
+    , colorizer-src
     , stable
     , master
     , ...
@@ -158,6 +169,19 @@
           version = "master";
           src = which-key-src;
         };
+
+        conceal = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "conceal";
+          version = "master";
+          src = conceal-src;
+        };
+
+        colorizer = prev.vimUtils.buildVimPluginFrom2Nix {
+          pname = "colorizer";
+          version = "master";
+          src = colorizer-src;
+        };
+
 
 
 
@@ -289,6 +313,12 @@
 
               # for generating boilerplate for comments
               neogen
+
+              # for showing ansi escape sequences
+              colorizer
+
+              # concealer
+              # conceal # conflicts with treesitter
 
               # Compile syntaxes into treesitter
               (prev.vimPlugins.nvim-treesitter.withPlugins

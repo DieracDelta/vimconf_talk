@@ -97,6 +97,22 @@
         "type": "github"
       }
     },
+    "colorizer-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1554648757,
+        "narHash": "sha256-N7UVzk/XUX76XcPHds+lLMZzO7gahj/9LIfof2BPThc=",
+        "owner": "powerman",
+        "repo": "vim-plugin-AnsiEsc",
+        "rev": "690f820d20b6e3a79ba20499874eb7333aa4ca5c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "powerman",
+        "repo": "vim-plugin-AnsiEsc",
+        "type": "github"
+      }
+    },
     "comment-nvim-src": {
       "flake": false,
       "locked": {
@@ -110,6 +126,22 @@
       "original": {
         "owner": "numToStr",
         "repo": "Comment.nvim",
+        "type": "github"
+      }
+    },
+    "conceal-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1478179438,
+        "narHash": "sha256-yeId7EXZZl3n/icngGgsj0Db3Gxgq53daby6iq4MpvU=",
+        "owner": "ticki",
+        "repo": "rust-cute-vim",
+        "rev": "ad22be8aece24a792f274e521107fe49c41f9751",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ticki",
+        "repo": "rust-cute-vim",
         "type": "github"
       }
     },
@@ -514,7 +546,9 @@
         "blamer-nvim-src": "blamer-nvim-src",
         "cmp-buffer": "cmp-buffer_2",
         "cmp-nvim-lsp": "cmp-nvim-lsp",
+        "colorizer-src": "colorizer-src",
         "comment-nvim-src": "comment-nvim-src",
+        "conceal-src": "conceal-src",
         "dracula-nvim": "dracula-nvim_2",
         "fidget-src": "fidget-src",
         "flake-utils": "flake-utils_2",

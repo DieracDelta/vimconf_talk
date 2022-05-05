@@ -57,6 +57,7 @@ with dsl; {
       "K" = [ "<cmd>lua show_documentation()<CR>" "Get Type Information" ];
       "['<leader>']" = {
         name = "+leader_bindings";
+        "ai" = [ "<cmd>AnsiEsc<CR>" "Replace ansi escape codes with colors" ];
         "D" = [ "<cmd>lua vim.lsp.buf.declaration()<CR>" "Jump to Declaration" ];
         "d" = [ "<cmd>lua vim.lsp.buf.definition()<CR>" "Jump to Definition" ];
         "i" = [ "<cmd>lua vim.lsp.buf.implementation()<CR>" "Jump to Implementation" ];
