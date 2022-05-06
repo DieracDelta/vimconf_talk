@@ -335,17 +335,16 @@
       },
       "locked": {
         "dir": "contrib",
-        "lastModified": 1651404709,
-        "narHash": "sha256-Xnfn4oiiOHAC5yOHSQ/N1tIdqK1XvzltViY7EW+XLKw=",
+        "lastModified": 1651842040,
+        "narHash": "sha256-63defqj9r+BZvUDTwyQRT1WCRaRLwgfesZ5PoyQy1BM=",
         "owner": "neovim",
         "repo": "neovim",
-        "rev": "65b4bf055f58eb622f59188c3bace2519cb777b1",
+        "rev": "d9ec57e16a13f66a4b17edd872786e2c67348752",
         "type": "github"
       },
       "original": {
         "dir": "contrib",
         "owner": "neovim",
-        "ref": "master",
         "repo": "neovim",
         "type": "github"
       }
@@ -712,15 +711,16 @@
     "which-key-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1647590687,
-        "narHash": "sha256-KvzS9Lzkw09s0TRmHLN/CLjXvietGJzI06W7WNChcwI=",
+        "lastModified": 1651651877,
+        "narHash": "sha256-UoV9H3oVJL1BPmuG+/eU4cG1s7thOrcrPyat9npBxm0=",
         "owner": "folke",
         "repo": "which-key.nvim",
-        "rev": "a3c19ec5754debb7bf38a8404e36a9287b282430",
+        "rev": "bd4411a2ed4dd8bb69c125e339d837028a6eea71",
         "type": "github"
       },
       "original": {
         "owner": "folke",
+        "ref": "bd4411a2ed4dd8bb69c125e339d837028a6eea71",
         "repo": "which-key.nvim",
         "type": "github"
       }

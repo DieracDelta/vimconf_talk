@@ -55,6 +55,8 @@ with dsl; {
   use.which-key.register = callWith
     {
       "K" = [ "<cmd>lua show_documentation()<CR>" "Get Type Information" ];
+      "j" = [ "gj" "Wrapped down" ];
+      "k" = [ "gk" "Wrapped up" ];
       "['<leader>']" = {
         name = "+leader_bindings";
         "ai" = [ "<cmd>AnsiEsc<CR>" "Replace ansi escape codes with colors" ];

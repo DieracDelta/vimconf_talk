@@ -21,7 +21,7 @@
       inputs.nixpkgs.follows = "stable";
     };
     neovim = {
-      url = "github:neovim/neovim?dir=contrib&ref=master";
+      url = "github:neovim/neovim?dir=contrib&tag=master";
     };
     telescope-src = {
       url =
@@ -73,7 +73,7 @@
       flake = false;
     };
     which-key-src = {
-      url = "github:folke/which-key.nvim";
+      url = "github:folke/which-key.nvim?ref=bd4411a2ed4dd8bb69c125e339d837028a6eea71";
       flake = false;
     };
     conceal-src = {
